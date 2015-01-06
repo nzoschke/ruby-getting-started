@@ -1,0 +1,27 @@
+---
+postgres:
+  image: postgres:latest
+  ports:
+  - 5432
+web:
+  build: "."
+  command: bundle exec unicorn -p $PORT -c ./config/unicorn.rb
+  volumes:
+  - ".:myapp"
+  ports:
+  - 5000:5000
+  environment:
+  - DATABASE_URL=postgres://postgres@postgres/myapp-web
+  links:
+  - postgres
+test:
+  build: "."
+  command: bundle exec rake db:setup test
+  volumes:
+  - ".:myapp"
+  ports:
+  - 5000:5000
+  environment:
+  - DATABASE_URL=postgres://postgres@postgres/myapp-test
+  links:
+  - postgres
